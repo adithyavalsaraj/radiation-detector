@@ -31,6 +31,7 @@ function App() {
   const [direction, setDirection] = useState("STABLE");
   const [emitters, setEmitters] = useState([]);
   const [connected, setConnected] = useState(false);
+  const [isNative, setIsNative] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [filterTab, setFilterTab] = useState("ALL");
@@ -123,6 +124,7 @@ function App() {
       
       const nativeEmitters = await NativeScanner.scan();
       if (nativeEmitters.length > 0) {
+        setIsNative(true);
         setEmitters((prev) => {
           // Merge native results with existing ones (preferring socket data if connected)
           const merged = [...prev];
@@ -133,6 +135,8 @@ function App() {
           });
           return merged;
         });
+      } else {
+        setIsNative(false);
       }
     }, 5000);
 
@@ -314,17 +318,19 @@ function App() {
         </button>
 
         {!connected && (
-          <div className="status-banner">
-            OFFLINE 
-            <button 
-              className="configure-btn"
-              onClick={() => {
-                localStorage.removeItem("onboarding_complete");
-                window.location.reload();
-              }}
-            >
-              CONFIGURE
-            </button>
+          <div className={`status-banner ${isNative ? "native-status" : ""}`}>
+            {isNative ? "NATIVE SCANNING" : "OFFLINE"}
+            {!isNative && (
+              <button 
+                className="configure-btn"
+                onClick={() => {
+                  localStorage.removeItem("onboarding_complete");
+                  window.location.reload();
+                }}
+              >
+                CONFIGURE
+              </button>
+            )}
           </div>
         )}
 

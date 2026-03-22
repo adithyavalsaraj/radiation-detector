@@ -370,6 +370,13 @@ body {
   letter-spacing: 1px;
 }
 
+.status-banner.native-status {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border-color: rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+}
+
 .blip-container.selected .blip-dot {
   width: 16px;
   height: 16px;
