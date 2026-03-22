@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -23,7 +25,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install --no-package-lock
+        run: npm run install:all --if-present || npm install --no-package-lock
 
       - name: Build and Package
         run: npm run build:app -- -p always
@@ -40,3 +42,45 @@ jobs:
             release/*.AppImage
             release/*.zip
           if-no-files-found: warn
+
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install Dependencies
+        run: npm install --no-package-lock
+      - name: Build Frontend
+        run: npm run build:frontend
+      - name: Sync Capacitor Android
+        run: npx cap sync android || echo "Already synced"
+        working-directory: frontend
+      - name: Build Android APK
+        run: chmod +x gradlew && ./gradlew assembleDebug
+        working-directory: frontend/android
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Radiation-Tracker-Android
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: "v1.0.0"
+          name: "Radiation Tracker Automatic Release"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
