@@ -45,6 +45,7 @@ function App() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const nativeEmptyCountRef = useRef(0);
   const sweepAngleRef = useRef(0);
   const anglesRef = useRef({});
   const socketRef = useRef(null);
@@ -125,18 +126,33 @@ function App() {
       const nativeEmitters = await NativeScanner.scan();
       if (nativeEmitters.length > 0) {
         setIsNative(true);
+        nativeEmptyCountRef.current = 0;
         setEmitters((prev) => {
-          // Merge native results with existing ones (preferring socket data if connected)
           const merged = [...prev];
           nativeEmitters.forEach(ne => {
-            const idx = merged.findIndex(e => e.id === ne.id);
-            if (idx === -1) merged.push(ne);
-            else if (!connected) merged[idx] = { ...merged[idx], ...ne }; 
+            const id = ne.id;
+            const rssi = ne.rssi || -95;
+            const smoothedRssi = smooth(id, rssi);
+            const distance = getDistanceFactor(smoothedRssi);
+
+            if (!anglesRef.current[id]) {
+              anglesRef.current[id] = Math.random() * 360;
+            }
+            const angle = anglesRef.current[id];
+            
+            const processedEmitter = { ...ne, angle, distance, smoothedRssi };
+
+            const idx = merged.findIndex(e => e.id === id);
+            if (idx === -1) merged.push(processedEmitter);
+            else if (!connected) merged[idx] = { ...merged[idx], ...processedEmitter }; 
           });
           return merged;
         });
       } else {
-        setIsNative(false);
+        nativeEmptyCountRef.current++;
+        if (nativeEmptyCountRef.current >= 3) {
+          setIsNative(false);
+        }
       }
     }, 2000);
 
@@ -168,6 +184,27 @@ function App() {
   };
 
   const handleMouseUp = () => setIsDragging(false);
+
+  // Touch handlers for mobile pan
+  const handleTouchStart = (e) => {
+    if (e.target.closest(".zoom-btn")) return;
+    setIsDragging(true);
+    const touch = e.touches[0];
+    dragStartRef.current = {
+      x: touch.clientX - panOffset.x,
+      y: touch.clientY - panOffset.y,
+    };
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    if (e.cancelable) e.preventDefault();
+    const touch = e.touches[0];
+    setPanOffset({
+      x: touch.clientX - dragStartRef.current.x,
+      y: touch.clientY - dragStartRef.current.y,
+    });
+  };
 
   const getFilteredList = () => {
     let list = [];
@@ -361,6 +398,10 @@ function App() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleMouseUp}
+          onTouchCancel={handleMouseUp}
         >
           <div
             className="radar-viewport"
