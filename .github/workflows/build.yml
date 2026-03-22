@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
@@ -29,7 +30,9 @@ jobs:
         run: npm install
 
       - name: Build and Package
-        run: npm run build:app -- -p always
+        run: |
+          npm run build:frontend
+          npm run build:app -- -p always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -66,7 +69,8 @@ jobs:
       - name: Build Frontend
         run: npm run build:frontend
       - name: Sync Capacitor Android
-        run: npx cap sync android || echo "Already synced"
+        run: |
+          npx cap sync android
         working-directory: frontend
       - name: Build Android APK
         run: chmod +x gradlew && ./gradlew assembleDebug
