@@ -32,29 +32,29 @@ export const NativeScanner = {
         const { networks } = await CapacitorWifi.getAvailableNetworks();
         
         results = networks.map(w => ({
-          id: w.ssid || Math.random().toString(),
-          mac: 'WIFI-AP',
+          id: w.bssid || w.ssid || Math.random().toString(),
+          mac: w.bssid || 'WIFI-AP',
           ssid: w.ssid,
           rssi: w.rssi || -95,
           source: 'WIFI',
           type: 'WiFi Access Point',
           lastSeen: Date.now(),
           name: (w.ssid === '<redacted>' || !w.ssid || w.ssid === '<hidden>') 
-                ? `NATIVE SOURCE` 
+                ? (w.bssid || `HIDDEN AP`) 
                 : w.ssid
         }));
       } else if (platform === 'ios') {
         const info = await CapacitorWifi.getWifiInfo();
         if (info.ssid) {
           results.push({
-            id: info.ssid,
+            id: info.bssid || info.ssid || 'IOS-WIFI',
             mac: info.bssid || 'CONNECTED',
             ssid: info.ssid,
             rssi: info.signalStrength ? (info.signalStrength - 100) : -50,
             source: 'WIFI',
             type: 'WiFi Access Point',
             lastSeen: Date.now(),
-            name: info.ssid
+            name: info.ssid || info.bssid || 'WIFI NETWORK'
           });
         }
       }
