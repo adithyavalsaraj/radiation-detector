@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import './Onboarding.css';
 import { NativeScanner } from '../utils/NativeScanner';
 
 const isElectron = navigator.userAgent.toLowerCase().includes(" electron/");
