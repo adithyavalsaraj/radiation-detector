@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
-const isDev = require('electron-is-dev');
 
 let serverProcess;
 
@@ -26,7 +25,7 @@ function createWindow() {
     },
   });
 
-  if (isDev) {
+  if (!app.isPackaged) {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
   } else {
@@ -38,7 +37,7 @@ function createWindow() {
 app.whenReady().then(() => {
   // In dev mode, we use concurrently to run the server. 
   // In production, we must explicitly spawn the node server.
-  if (!isDev) {
+  if (app.isPackaged) {
     startBackend();
   }
 
