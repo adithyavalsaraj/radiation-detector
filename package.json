@@ -11,11 +11,42 @@
     "dev:web": "npm run dev --workspace=frontend",
     "server": "npm start --workspace=backend",
     "dev:desktop": "concurrently \"npm run server\" \"npm run dev:web\" \"wait-on http://localhost:5173 && electron .\"",
-    "start": "concurrently \"npm run server\" \"npm run dev:web\""
+    "start": "concurrently \"npm run server\" \"npm run dev:web\"",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:app": "npm run build:frontend && electron-builder"
+  },
+  "build": {
+    "appId": "com.wifilocator.app",
+    "productName": "Radiation Tracker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "backend/**/*",
+      "frontend/dist/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-is-dev": "^3.0.1",
     "wait-on": "^7.2.0"
   },
   "main": "main.js"
