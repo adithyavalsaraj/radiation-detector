@@ -2,6 +2,8 @@ import { CapacitorWifi } from '@capgo/capacitor-wifi';
 import { BleClient } from '@capacitor-community/bluetooth-le';
 import { Capacitor } from '@capacitor/core';
 
+let bleInitialized = false;
+
 /**
  * NativeScanner provides a bridge to native WiFi scanning APIs on mobile devices.
  */
@@ -17,8 +19,6 @@ export const NativeScanner = {
 
     // --- WIFI SCAN ---
     try {
-      // 1. Check & Request Permissions
-      // WiFi operations require location permissions.
       const status = await CapacitorWifi.checkPermissions();
       if (status.location !== 'granted') {
         const req = await CapacitorWifi.requestPermissions();
@@ -64,16 +64,14 @@ export const NativeScanner = {
 
     // --- BLUETOOTH LE SCAN ---
     try {
-      await BleClient.initialize();
-      
-      // Permission request implicitly happens on scan for many Capacitor BLE plugins,
-      // but we should ideally check.
+      if (!bleInitialized) {
+        await BleClient.initialize();
+        bleInitialized = true;
+      }
       
       const bleDevices = [];
       await BleClient.requestLEScan(
-        {
-          services: [], // Empty for all
-        },
+        { services: [] },
         (result) => {
           if (result.device) {
             bleDevices.push({
@@ -90,7 +88,7 @@ export const NativeScanner = {
         }
       );
 
-      // Wait 1.5s for scan results
+      // Wait for results
       await new Promise(r => setTimeout(r, 1500));
       await BleClient.stopLEScan();
 
