@@ -27,20 +27,20 @@ export default function DownloadsModal({ onClose }) {
         </p>
 
         <div className="download-grid">
-          <a href="/downloads/RadiationTracker-Mac.dmg" className="download-btn mac" onClick={(e) => { e.preventDefault(); alert("Creating DMG in final build."); }}>
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/actions" target="_blank" rel="noopener noreferrer" className="download-btn mac">
             🍏 Mac (DMG) {os === 'mac' && "★"}
           </a>
-          <a href="/downloads/RadiationTracker-Win.exe" className="download-btn win" onClick={(e) => { e.preventDefault(); alert("Creating EXE in final build."); }}>
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/actions" target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (EXE) {os === 'win' && "★"}
           </a>
-          <a href="/downloads/RadiationTracker-Linux.AppImage" className="download-btn lin" onClick={(e) => { e.preventDefault(); alert("Creating AppImage in final build."); }}>
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/actions" target="_blank" rel="noopener noreferrer" className="download-btn lin">
             🐧 Linux (AppImage) {os === 'lin' && "★"}
           </a>
-          <a href="/downloads/RadiationTracker-Android.apk" className="download-btn and" onClick={(e) => { e.preventDefault(); alert("Creating APK in final build."); }}>
-            📱 Android (APK) {os === 'and' && "★"}
+          <a href="https://github.com/adithyavalsaraj/radiation-detector" target="_blank" rel="noopener noreferrer" className="download-btn and">
+            📱 Android (Source) {os === 'and' && "★"}
           </a>
-          <a href="#" className="download-btn ios" onClick={(e) => { e.preventDefault(); alert("iOS requires TestFlight/Sideloading."); }}>
-            🍎 iOS (IPA) {os === 'ios' && "★"}
+          <a href="https://github.com/adithyavalsaraj/radiation-detector" target="_blank" rel="noopener noreferrer" className="download-btn ios">
+            🍎 iOS (Source) {os === 'ios' && "★"}
           </a>
         </div>
       </div>
