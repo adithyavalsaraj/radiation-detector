@@ -47,5 +47,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to scan for nearby WiFi networks and measure radiation levels.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs access to your local network to discover and connect to Desktop Core Nodes.</string>
 </dict>
 </plist>
