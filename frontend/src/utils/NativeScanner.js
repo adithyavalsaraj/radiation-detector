@@ -1,4 +1,5 @@
 import { CapacitorWifi } from '@capgo/capacitor-wifi';
+import { BleClient } from '@capacitor-community/bluetooth-le';
 import { Capacitor } from '@capacitor/core';
 
 /**
@@ -12,6 +13,9 @@ export const NativeScanner = {
   scan: async () => {
     if (!NativeScanner.isSupported()) return [];
 
+    let results = [];
+
+    // --- WIFI SCAN ---
     try {
       // 1. Check & Request Permissions
       // WiFi operations require location permissions.
@@ -24,14 +28,12 @@ export const NativeScanner = {
       const platform = Capacitor.getPlatform();
 
       if (platform === 'android') {
-        // Android specific: actual scanning
-        // Note: startScan triggers an event, we can wait or just pull available ones
         await CapacitorWifi.startScan();
         const { networks } = await CapacitorWifi.getAvailableNetworks();
         
-        return networks.map(w => ({
+        results = networks.map(w => ({
           id: w.ssid || Math.random().toString(),
-          mac: '00:00:00:00:00:00', // Plugin doesn't always provide BSSID in basic network list
+          mac: 'WIFI-AP',
           ssid: w.ssid,
           rssi: w.rssi || -95,
           source: 'WIFI',
@@ -42,25 +44,61 @@ export const NativeScanner = {
                 : w.ssid
         }));
       } else if (platform === 'ios') {
-        // iOS specific: can only get current connection info
         const info = await CapacitorWifi.getWifiInfo();
-        if (!info.ssid) return [];
-        return [{
-          id: info.ssid,
-          mac: info.bssid || 'CONNECTED',
-          ssid: info.ssid,
-          rssi: info.signalStrength ? (info.signalStrength - 100) : -50,
-          source: 'WIFI',
-          type: 'WiFi Access Point',
-          lastSeen: Date.now(),
-          name: info.ssid
-        }];
+        if (info.ssid) {
+          results.push({
+            id: info.ssid,
+            mac: info.bssid || 'CONNECTED',
+            ssid: info.ssid,
+            rssi: info.signalStrength ? (info.signalStrength - 100) : -50,
+            source: 'WIFI',
+            type: 'WiFi Access Point',
+            lastSeen: Date.now(),
+            name: info.ssid
+          });
+        }
       }
-
-      return [];
     } catch (err) {
-      console.error('Native Scan Failed:', err);
-      return [];
+      console.error('Native WiFi Scan Failed:', err);
     }
+
+    // --- BLUETOOTH LE SCAN ---
+    try {
+      await BleClient.initialize();
+      
+      // Permission request implicitly happens on scan for many Capacitor BLE plugins,
+      // but we should ideally check.
+      
+      const bleDevices = [];
+      await BleClient.requestLEScan(
+        {
+          services: [], // Empty for all
+        },
+        (result) => {
+          if (result.device) {
+            bleDevices.push({
+              id: result.device.deviceId,
+              mac: result.device.deviceId,
+              ssid: result.device.name || 'Bluetooth LE Device',
+              rssi: result.rssi || -95,
+              source: 'BLUETOOTH',
+              type: 'Bluetooth Device',
+              lastSeen: Date.now(),
+              name: result.device.name || 'UNKNOWN BT'
+            });
+          }
+        }
+      );
+
+      // Wait 1.5s for scan results
+      await new Promise(r => setTimeout(r, 1500));
+      await BleClient.stopLEScan();
+
+      results = [...results, ...bleDevices];
+    } catch (err) {
+      console.error('Native BLE Scan Failed:', err);
+    }
+
+    return results;
   }
 };
