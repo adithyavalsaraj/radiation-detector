@@ -1,4 +1,4 @@
-import { Wifi } from '@capgo/capacitor-wifi';
+import { CapacitorWifi } from '@capgo/capacitor-wifi';
 import { Capacitor } from '@capacitor/core';
 
 /**
@@ -17,7 +17,7 @@ export const NativeScanner = {
       // On Android, we need ACCESS_FINE_LOCATION. 
       // The plugin handles the low-level scan, but we need the permission.
       
-      const { wifi } = await Wifi.scan();
+      const { wifi } = await CapacitorWifi.scan();
       
       // 2. Map to existing emitter model
       // WiFi { ssid, bssid, rssi, capabilities, level, frequency }
