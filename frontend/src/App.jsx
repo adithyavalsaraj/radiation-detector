@@ -287,7 +287,20 @@ function App() {
           ☰
         </button>
 
-        {!connected && <div className="status-banner">OFFLINE</div>}
+        {!connected && (
+          <div className="status-banner">
+            OFFLINE 
+            <button 
+              className="configure-btn"
+              onClick={() => {
+                localStorage.removeItem("onboarding_complete");
+                window.location.reload();
+              }}
+            >
+              CONFIGURE
+            </button>
+          </div>
+        )}
 
         <div className="zoom-controls">
           <button 

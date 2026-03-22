@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './Onboarding.css';
 
-const isElectron = navigator.userAgent.toLowerCase().includes(" electron/");
-const isLocalhost = window.location.hostname === 'localhost' || window.false;
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isCapacitor = window.origin && window.origin.includes("capacitor://");
 
 export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
   const [step, setStep] = useState(0);
@@ -20,9 +20,9 @@ export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
     },
     {
       title: "Connection Setup",
-      description: isElectron || isLocalhost 
+      description: (isElectron || (isLocalhost && !isCapacitor))
         ? "You are running the local app! We are connecting automatically to your system's hardware scanner."
-        : "You are using the Web Dashboard. Please enter the IP address of your Desktop Core Node to remotely connect to its scanner. You can find this on your desktop app.",
+        : "You are using a Remote Dashboard. Please enter the IP address of your Desktop Core Node to remotely connect to its scanner. You can find this on your desktop app.",
       isConnection: true
     }
   ];
@@ -45,7 +45,7 @@ export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
         {!currentStep.isConnection && <div className="onboarding-icon">{currentStep.icon}</div>}
         <h2>{currentStep.title}</h2>
         <p className="onboarding-desc">{currentStep.description}</p>
-        {currentStep.isConnection && (!isElectron && !isLocalhost) && (
+        {currentStep.isConnection && (!isElectron && (!isLocalhost || isCapacitor)) && (
           <div className="connection-setup">
             <label>CORE NODE IP ADDRESS</label>
             <input 
