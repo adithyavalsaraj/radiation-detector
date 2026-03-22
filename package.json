@@ -15,9 +15,14 @@
     "build:frontend": "npm run build --workspace=frontend",
     "build:app": "npm run build:frontend && electron-builder"
   },
+  "repository": "https://github.com/adithyavalsaraj/radiation-detector",
   "build": {
     "appId": "com.wifilocator.app",
     "productName": "Radiation Tracker",
+    "artifactName": "RadiationTracker-${os}.${ext}",
+    "publish": [
+      "github"
+    ],
     "directories": {
       "output": "release"
     },
