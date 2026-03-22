@@ -1,0 +1,5 @@
+{
+  "appId": "com.wifilocator.app",
+  "appName": "WiFi Locator",
+  "webDir": "dist"
+}

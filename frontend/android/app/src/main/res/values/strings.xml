@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WiFi Locator</string>
+    <string name="title_activity_main">WiFi Locator</string>
+    <string name="package_name">com.wifilocator.app</string>
+    <string name="custom_url_scheme">com.wifilocator.app</string>
+</resources>
