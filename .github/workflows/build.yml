@@ -23,7 +23,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm run install:all
+        run: npm install --no-package-lock
 
       - name: Build and Package
         run: npm run build:app
