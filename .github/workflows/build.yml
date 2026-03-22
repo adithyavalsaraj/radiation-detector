@@ -29,14 +29,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build Frontend
-        run: npm run build:frontend
-
-      - name: List Files after Frontend Build
-        run: ls -R frontend/dist
-
       - name: Build and Package Desktop App
-        run: npx electron-builder build --publish always
+        run: |
+          npm run build:frontend
+          npx electron-builder build --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,8 +68,6 @@ jobs:
         run: npm install
       - name: Build Frontend
         run: npm run build:frontend
-      - name: List Files
-        run: ls -R frontend/dist
       - name: Sync Capacitor Android
         run: npx cap sync android
         working-directory: frontend
