@@ -7,7 +7,7 @@
     "backend"
   ],
   "scripts": {
-    "install:all": "npm install && npm install --workspace=frontend && npm install --workspace=backend",
+    "install:all": "npm install",
     "dev:web": "npm run dev --workspace=frontend",
     "server": "npm start --workspace=backend",
     "dev:desktop": "concurrently \"npm run server\" \"npm run dev:web\" \"wait-on http://localhost:5173 && electron .\"",
