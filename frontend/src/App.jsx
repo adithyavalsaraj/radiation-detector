@@ -10,13 +10,13 @@ const getInitialSocketUrl = () => {
   if (savedUrl) return savedUrl;
 
   const isElectron = navigator.userAgent.toLowerCase().includes(" electron/");
-  const isCapacitor = window.origin && window.origin.includes("capacitor://");
+  const isCapacitor = (window.location.origin && window.location.origin.includes("capacitor://")) || (window.location.hostname === 'localhost' && !isElectron);
 
   if (isElectron || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return "http://localhost:3001";
   }
 
-  return isCapacitor ? "http://192.168.1.100:3001" : "http://";
+  return isCapacitor ? "http://192.168.1.100:3001" : "http://localhost:3001";
 };
 
 function App() {

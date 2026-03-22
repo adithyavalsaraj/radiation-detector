@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './Onboarding.css';
 
+const isElectron = navigator.userAgent.toLowerCase().includes(" electron/");
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const isCapacitor = window.origin && window.origin.includes("capacitor://");
+const isCapacitor = (window.location.origin && window.location.origin.includes("capacitor://")) || (window.location.hostname === 'localhost' && !isElectron);
 
 export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
   const [step, setStep] = useState(0);
