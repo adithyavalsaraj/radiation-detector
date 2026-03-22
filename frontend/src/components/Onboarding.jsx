@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import './Onboarding.css';
+import { NativeScanner } from '../utils/NativeScanner';
 
 const isElectron = navigator.userAgent.toLowerCase().includes(" electron/");
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const isCapacitor = (window.location.origin && window.location.origin.includes("capacitor://")) || (window.location.hostname === 'localhost' && !isElectron);
+const isNative = NativeScanner.isSupported();
 
 export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
   const [step, setStep] = useState(0);
@@ -20,11 +20,14 @@ export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
       icon: "🔍"
     },
     {
-      title: "Connection Setup",
-      description: (isElectron || (isLocalhost && !isCapacitor))
-        ? "You are running the local app! We are connecting automatically to your system's hardware scanner."
-        : "You are using a Remote Dashboard. Please enter the IP address of your Desktop Core Node to remotely connect to its scanner. You can find this on your desktop app.",
-      isConnection: true
+      title: isNative ? "Native Scanning Ready" : "Connection Setup",
+      description: isNative 
+        ? "Great news! Your device supports native hardware scanning. You don't need to connect to another computer—your phone's internal antenna is ready to trace radiation directly."
+        : (isElectron || (isLocalhost && !isCapacitor))
+          ? "You are running the local app! We are connecting automatically to your system's hardware scanner."
+          : "You are using a Remote Dashboard. Please enter the IP address of your Desktop Core Node to remotely connect to its scanner. You can find this on your desktop app.",
+      isConnection: true,
+      hideInput: isNative
     }
   ];
 
@@ -46,7 +49,7 @@ export default function Onboarding({ onComplete, socketUrl, setSocketUrl }) {
         {!currentStep.isConnection && <div className="onboarding-icon">{currentStep.icon}</div>}
         <h2>{currentStep.title}</h2>
         <p className="onboarding-desc">{currentStep.description}</p>
-        {currentStep.isConnection && (!isElectron && (!isLocalhost || isCapacitor)) && (
+        {currentStep.isConnection && !currentStep.hideInput && (!isElectron && (!isLocalhost || isCapacitor)) && (
           <div className="connection-setup">
             <label>CORE NODE IP ADDRESS</label>
             <input 
