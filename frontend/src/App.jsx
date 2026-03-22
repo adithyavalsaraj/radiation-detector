@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import "./index.css";
 import Onboarding from './components/Onboarding';
 import DownloadsModal from './components/DownloadsModal';
+import { NativeScanner } from './utils/NativeScanner';
 
 const getInitialSocketUrl = () => {
 
@@ -112,6 +113,31 @@ function App() {
       if (socketRef.current) socketRef.current.disconnect();
     };
   }, [socketUrl]);
+
+  // NATIVE SCANNER EFFECT (For Mobile Offline Mode)
+  useEffect(() => {
+    if (!NativeScanner.isSupported()) return;
+
+    const nativeInterval = setInterval(async () => {
+      if (isPausedRef.current) return;
+      
+      const nativeEmitters = await NativeScanner.scan();
+      if (nativeEmitters.length > 0) {
+        setEmitters((prev) => {
+          // Merge native results with existing ones (preferring socket data if connected)
+          const merged = [...prev];
+          nativeEmitters.forEach(ne => {
+            const idx = merged.findIndex(e => e.id === ne.id);
+            if (idx === -1) merged.push(ne);
+            else if (!connected) merged[idx] = { ...merged[idx], ...ne }; 
+          });
+          return merged;
+        });
+      }
+    }, 5000);
+
+    return () => clearInterval(nativeInterval);
+  }, [connected]);
 
   useEffect(() => {
     const sweepInterval = setInterval(() => {
