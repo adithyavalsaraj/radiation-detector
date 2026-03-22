@@ -138,7 +138,7 @@ function App() {
       } else {
         setIsNative(false);
       }
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(nativeInterval);
   }, [connected]);
@@ -319,7 +319,7 @@ function App() {
 
         {!connected && (
           <div className={`status-banner ${isNative ? "native-status" : ""}`}>
-            {isNative ? "NATIVE SCANNING" : "OFFLINE"}
+            {isNative ? "NATIVE SCANNING ACTIVE" : "OFFLINE"}
             {!isNative && (
               <button 
                 className="configure-btn"
