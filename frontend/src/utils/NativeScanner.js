@@ -13,9 +13,15 @@ export const NativeScanner = {
     if (!NativeScanner.isSupported()) return [];
 
     try {
-      // 1. Request Permissions
-      // On Android, we need ACCESS_FINE_LOCATION. 
-      // The plugin handles the low-level scan, but we need the permission.
+      // 1. Check & Request Permissions
+      // WiFi scanning requires location permissions on Android.
+      if (Capacitor.getPlatform() === 'android') {
+        const permStatus = await Wifi.checkPermissions();
+        if (permStatus.location !== 'granted') {
+          const reqStatus = await Wifi.requestPermissions();
+          if (reqStatus.location !== 'granted') return [];
+        }
+      }
       
       const { wifi } = await CapacitorWifi.scan();
       
