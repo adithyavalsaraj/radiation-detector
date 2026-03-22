@@ -16,9 +16,9 @@ export const NativeScanner = {
       // 1. Check & Request Permissions
       // WiFi scanning requires location permissions on Android.
       if (Capacitor.getPlatform() === 'android') {
-        const permStatus = await Wifi.checkPermissions();
+        const permStatus = await CapacitorWifi.checkPermissions();
         if (permStatus.location !== 'granted') {
-          const reqStatus = await Wifi.requestPermissions();
+          const reqStatus = await CapacitorWifi.requestPermissions();
           if (reqStatus.location !== 'granted') return [];
         }
       }
