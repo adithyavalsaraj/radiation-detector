@@ -6,12 +6,14 @@ const isDev = require('electron-is-dev');
 let serverProcess;
 
 function startBackend() {
-  // In production, backend files are usually placed in resourcesPath
   const serverPath = app.isPackaged 
-    ? path.join(process.resourcesPath, 'backend', 'server.js')
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'backend', 'server.js')
     : path.join(__dirname, 'backend', 'server.js');
     
-  serverProcess = spawn('node', [serverPath], { stdio: 'inherit' });
+  serverProcess = spawn('node', [serverPath], { 
+    stdio: 'inherit',
+    env: { ...process.env, NODE_ENV: 'production' }
+  });
 }
 
 function createWindow() {
