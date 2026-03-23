@@ -4,6 +4,11 @@ const { Server } = require('socket.io');
 const { exec } = require('child_process');
 const cors = require('cors');
 const os = require('os');
+const path = require('path');
+
+function getUnpackedPath(filename) {
+  return path.join(__dirname, filename).replace('app.asar', 'app.asar.unpacked');
+}
 
 const isWin = os.platform() === 'win32';
 const isMac = os.platform() === 'darwin';
@@ -53,7 +58,8 @@ setInterval(pingSweep, 30000);
 function getScannerData() {
   return new Promise((resolve) => {
     if (isMac) {
-      exec('swift scanner.swift', { cwd: __dirname }, (error, stdout) => {
+      const scriptPath = getUnpackedPath('scanner.swift');
+      exec(`swift "${scriptPath}"`, (error, stdout) => {
         if (error) return resolve({ wifi: [], bluetooth: [] });
         try { resolve(JSON.parse(stdout)); } catch (e) { resolve({ wifi: [], bluetooth: [] }); }
       });
@@ -82,7 +88,8 @@ function getScannerData() {
       });
 
       const btPromise = new Promise((res) => {
-        exec(`powershell -ExecutionPolicy Bypass -File scanner.ps1`, { cwd: __dirname }, (error, stdout) => {
+        const scriptPath = getUnpackedPath('scanner.ps1');
+        exec(`powershell -ExecutionPolicy Bypass -File "${scriptPath}"`, (error, stdout) => {
           if (error) return res([]);
           try {
             const data = JSON.parse(stdout);
