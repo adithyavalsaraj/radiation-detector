@@ -42,10 +42,7 @@
       "target": [
         "dmg",
         "zip"
-      ],
-      "dmg": {
-        "artifactName": "${productName}-${os}-dmg.${ext}"
-      }
+      ]
     },
     "win": {
       "artifactName": "${productName}-${os}-zip.${ext}",
@@ -53,21 +50,24 @@
         "nsis",
         "portable",
         "zip"
-      ],
-      "nsis": {
-        "artifactName": "${productName}-${os}-nsis.${ext}"
-      },
-      "portable": {
-        "artifactName": "${productName}-${os}-portable.${ext}"
-      }
+      ]
     },
     "linux": {
       "target": [
         "AppImage"
-      ],
-      "appImage": {
-        "artifactName": "${productName}-${os}-appimage.${ext}"
-      }
+      ]
+    },
+    "dmg": {
+      "artifactName": "${productName}-${os}-dmg.${ext}"
+    },
+    "nsis": {
+      "artifactName": "${productName}-${os}-nsis.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${os}-portable.${ext}"
+    },
+    "appImage": {
+      "artifactName": "${productName}-${os}-appimage.${ext}"
     }
   },
   "devDependencies": {
