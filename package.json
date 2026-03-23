@@ -1,6 +1,11 @@
 {
   "name": "wifi-locator-monorepo",
   "version": "1.1.2",
+<<<<<<< HEAD
+=======
+  "description": "WiFi Radiation Detector and Radar Tracker",
+  "author": "adithyavalsaraj",
+>>>>>>> 0e4c5a0 (feat: unique artifact names, increased timeouts, and parallel android builds)
   "private": true,
   "workspaces": [
     "frontend",
@@ -19,8 +24,8 @@
   "repository": "https://github.com/adithyavalsaraj/radiation-detector",
   "build": {
     "appId": "com.wifilocator.app",
-    "productName": "Radiation Tracker",
-    "artifactName": "RadiationTracker-${os}.${ext}",
+    "productName": "RadiationTracker",
+    "artifactName": "${productName}-${os}-${target}.${ext}",
     "publish": [
       "github"
     ],
