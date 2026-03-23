@@ -388,6 +388,7 @@ function App() {
           <div className="legend-item"><span className="dot wifi"></span> WIFI AP</div>
           <div className="legend-item"><span className="dot node"></span> NODE</div>
           <div className="legend-item"><span className="dot bt"></span> BT</div>
+          <div className="legend-item"><span className="dot spy-cam"></span> SPY CAM ⚠️</div>
           <div className="legend-item"><span className="dot unknown"></span> UNKNOWN</div>
         </div>
 
@@ -441,14 +442,22 @@ function App() {
                   onClick={(e) => { e.stopPropagation(); setSelectedDevice(dev); }}
                 >
                   <div
-                    className="blip-dot"
+                    className={`blip-dot ${dev.type === 'POTENTIAL SPY CAMERA' ? 'spy-pulse' : ''}`}
                     style={{
-                      background: dev.source === 'WIFI' ? 'var(--color-router)' : dev.source === 'BLUETOOTH' ? 'var(--color-bluetooth)' : 'var(--accent-color)',
-                      width: dev.source === 'WIFI' ? '6px' : '8px',
-                      height: dev.source === 'WIFI' ? '6px' : '8px'
+                      background: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' :
+                                 dev.type === 'IP CAMERA' ? '#ff9d00' :
+                                 dev.source === 'WIFI' ? 'var(--color-router)' : 
+                                 dev.source === 'BLUETOOTH' ? 'var(--color-bluetooth)' : 'var(--accent-color)',
+                      width: dev.type === 'POTENTIAL SPY CAMERA' ? '12px' : (dev.source === 'WIFI' ? '6px' : '8px'),
+                      height: dev.type === 'POTENTIAL SPY CAMERA' ? '12px' : (dev.source === 'WIFI' ? '6px' : '8px')
                     }}
                   >
-                    <div className="blip-label" style={{ transform: `rotate(-${dev.angle}deg)` }}>
+                    <div className="blip-label" style={{ 
+                      transform: `rotate(-${dev.angle}deg)`,
+                      color: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' : '#fff',
+                      borderColor: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' : 'rgba(255, 255, 255, 0.1)'
+                    }}>
+                      {dev.type === 'POTENTIAL SPY CAMERA' ? '⚠️ ' : ''}
                       {(dev.name || dev.ssid || 'UNKNOWN').toUpperCase()}
                     </div>
                   </div>

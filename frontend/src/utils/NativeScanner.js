@@ -2,6 +2,43 @@ import { CapacitorWifi } from '@capgo/capacitor-wifi';
 import { BleClient } from '@capacitor-community/bluetooth-le';
 import { Capacitor } from '@capacitor/core';
 
+const vendors = {
+  'APPLE': ['000393', '000502', '000a27', '000d93', '0010fa', '0016cb', '0017f2', '0019e3', '001b63', '0a60c0', '80b989', '747786', 'bcd1d3', 'f8e9af', 'ac293a'],
+  'GOOGLE': ['001a11', '3c5ab4', 'da03a3', 'daa119', '94ebcd'],
+  'SAMSUNG': ['0000f0', '000278', '0007ab', 'dc0b34', '18227e'],
+  'TP_LINK': ['50c7bf', 'e8de27', '001478', 'b0be76', '14cc20', 'e894f6'],
+  'XIAOMI': ['04cf8c', '286c07', '640980'],
+  'AMAZON': ['00bb3a', 'ac63be', 'fc65de'],
+  'SONY': ['00014a', '00041f'],
+  'NEST': ['18b430', '641666'],
+  'ESPRESSIF': ['240ac4', '30aea4', 'a020a6', '4022d8', 'bcddc2', 'cc50e3', 'a4cf12', '10061c', '6cb456', '70041d', 'e89f6d', '70b8f6', '744dbd', '2462ab', '24d7eb'],
+  'TUYA_SMART': ['00337a', '105a17', '10d561', '1869d8', '18de50', '1c90ff', '20f1b2', '381f8d', '382ce5', '30487d', '3c0b59', 'fc3cd7', 'fc671f', 'cc8cbf', '4ca919', '80647c', '7cf666', '84e342', 'd8d668', 'd8fc92', 'e4aee4', 'bc351e'],
+  'HIKVISION': ['e4d58b', 'c8a702', '085411', '08a118', '00403d', '001006'],
+  'DAHUA': ['d4430e', '08eded', '14a78b', '38af29', '3ce36b', '3cef8c', 'bc3253'],
+  'WYZE': ['2caa8e', '7c78b2', '80482c', 'a4da22', 'd03f27', 'f0c88b'],
+  'ARLO': ['486264', 'a41162', 'fc9c98'],
+  'XIONGMAI': ['001215'],
+  'RING': ['040df2', 'b0c554', 'de2d64'],
+  'FOSCAM': ['00626e', 'b0d59d']
+};
+
+function classifyDevice(mac) {
+  if (!mac) return { vendor: 'UNKNOWN', type: 'UNKNOWN' };
+  const cleanMac = mac.toLowerCase().replace(/[^a-f0-9]/g, '');
+  const oui = cleanMac.substring(0, 6);
+  
+  for (const [vendor, ids] of Object.entries(vendors)) {
+    if (ids.some(id => oui.startsWith(id))) {
+      let type = vendor === 'TUYA_SMART' || vendor === 'XIONGMAI' ? 'POTENTIAL SPY CAMERA' : 
+                 ['HIKVISION', 'DAHUA', 'WYZE', 'ARLO', 'NEST', 'RING', 'FOSCAM'].includes(vendor) ? 'IP CAMERA' :
+                 vendor === 'ESPRESSIF' ? 'IOT MODULE' : 'SMART DEVICE';
+      return { vendor, type: type === 'SMART DEVICE' ? vendor : type };
+    }
+  }
+  
+  return { vendor: 'UNKNOWN', type: 'UNKNOWN NODE' };
+}
+
 let bleInitialized = false;
 
 /**
@@ -31,18 +68,21 @@ export const NativeScanner = {
         await CapacitorWifi.startScan();
         const { networks } = await CapacitorWifi.getAvailableNetworks();
         
-        results = networks.map(w => ({
-          id: w.bssid || w.ssid || Math.random().toString(),
-          mac: w.bssid || 'WIFI-AP',
-          ssid: w.ssid,
-          rssi: w.rssi || -95,
-          source: 'WIFI',
-          type: 'WiFi Access Point',
-          lastSeen: Date.now(),
-          name: (w.ssid === '<redacted>' || !w.ssid || w.ssid === '<hidden>') 
-                ? (w.bssid || `HIDDEN AP`) 
-                : w.ssid
-        }));
+        results = networks.map(w => {
+          const { vendor, type } = classifyDevice(w.bssid);
+          return {
+            id: w.bssid || w.ssid || Math.random().toString(),
+            mac: w.bssid || 'WIFI-AP',
+            ssid: w.ssid,
+            rssi: w.rssi || -95,
+            source: 'WIFI',
+            type: type,
+            lastSeen: Date.now(),
+            name: (w.ssid === '<redacted>' || !w.ssid || w.ssid === '<hidden>') 
+                  ? `${vendor} (Hidden Device)` 
+                  : w.ssid
+          };
+        });
       } else if (platform === 'ios') {
         const info = await CapacitorWifi.getWifiInfo();
         if (info.ssid) {
@@ -78,6 +118,7 @@ export const NativeScanner = {
           if (result.device && !seenDevices.has(result.device.deviceId)) {
             const deviceId = result.device.deviceId;
             const rawName = result.device.name || result.localName;
+            const { type } = classifyDevice(deviceId);
             
             // Format a better fallback name: Device Name OR "BT: [Last 4 chars of ID]"
             const displayName = rawName && rawName !== 'Unknown' 
@@ -90,7 +131,7 @@ export const NativeScanner = {
               ssid: displayName,
               rssi: result.rssi || -95,
               source: 'BLUETOOTH',
-              type: 'Bluetooth Device',
+              type: type || 'Bluetooth Device',
               lastSeen: Date.now(),
               name: displayName
             });

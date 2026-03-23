@@ -109,32 +109,41 @@ function getScannerData() {
   });
 }
 
+const vendors = {
+  'APPLE': ['000393', '000502', '000a27', '000d93', '0010fa', '0016cb', '0017f2', '0019e3', '001b63', '0a60c0', '80b989', '747786', 'bcd1d3', 'f8e9af', 'ac293a'],
+  'GOOGLE': ['001a11', '3c5ab4', 'da03a3', 'daa119', '94ebcd'],
+  'SAMSUNG': ['0000f0', '000278', '0007ab', 'dc0b34', '18227e'],
+  'TP_LINK': ['50c7bf', 'e8de27', '001478', 'b0be76', '14cc20', 'e894f6'],
+  'XIAOMI': ['04cf8c', '286c07', '640980'],
+  'AMAZON': ['00bb3a', 'ac63be', 'fc65de'],
+  'SONY': ['00014a', '00041f'],
+  'NEST': ['18b430', '641666'],
+  'ESPRESSIF': ['240ac4', '30aea4', 'a020a6', '4022d8', 'bcddc2', 'cc50e3', 'a4cf12', '10061c', '6cb456', '70041d', 'e89f6d', '70b8f6', '744dbd', '2462ab', '24d7eb'],
+  'TUYA_SMART': ['00337a', '105a17', '10d561', '1869d8', '18de50', '1c90ff', '20f1b2', '381f8d', '382ce5', '30487d', '3c0b59', 'fc3cd7', 'fc671f', 'cc8cbf', '4ca919', '80647c', '7cf666', '84e342', 'd8d668', 'd8fc92', 'e4aee4', 'bc351e'],
+  'HIKVISION': ['e4d58b', 'c8a702', '085411', '08a118', '00403d', '001006'],
+  'DAHUA': ['d4430e', '08eded', '14a78b', '38af29', '3ce36b', '3cef8c', 'bc3253'],
+  'WYZE': ['2caa8e', '7c78b2', '80482c', 'a4da22', 'd03f27', 'f0c88b'],
+  'ARLO': ['486264', 'a41162', 'fc9c98'],
+  'XIONGMAI': ['001215'],
+  'RING': ['040df2', 'b0c554', 'de2d64'],
+  'FOSCAM': ['00626e', 'b0d59d']
+};
+
 function classifyDevice(mac) {
-  if (!mac) return 'UNKNOWN';
-  const cleanMac = mac.toLowerCase().replace(/:/g, '');
+  if (!mac) return { vendor: 'UNKNOWN', type: 'UNKNOWN' };
+  const cleanMac = mac.toLowerCase().replace(/[^a-f0-9]/g, '');
   const oui = cleanMac.substring(0, 6);
   
-  const vendors = {
-    'APPLE': ['000393', '000502', '000a27', '000d93', '0010fa', '0016cb', '0017f2', '0019e3', '001b63', '0a60c0', '80b989', '747786', 'bcd1d3', 'f8e9af', 'ac293a'],
-    'GOOGLE': ['001a11', '3c5ab4', 'da03a3', 'daa119', '94ebcd'],
-    'SAMSUNG': ['0000f0', '000278', '0007ab', 'dc0b34', '18227e'],
-    'TP_LINK': ['50c7bf', 'e8de27', '001478', 'b0be76', '14cc20', 'e894f6'],
-    'XIAOMI': ['04cf8c', '286c07', '640980'],
-    'AMAZON': ['00bb3a', 'ac63be', 'fc65de'],
-    'SONY': ['00014a', '00041f'],
-    'HP': ['00110a', '001a4b'],
-    'NEST': ['18b430'],
-    'ESPRESSIF': ['240ac4', '30aea4', 'a020a6', '4022d8', 'bcddc2', 'cc50e3', 'a4cf12'],
-    'VMWARE': ['000c29', '000569', '005056']
-  };
-
   for (const [vendor, ids] of Object.entries(vendors)) {
     if (ids.some(id => oui.startsWith(id))) {
-      return vendor;
+      let type = vendor === 'TUYA_SMART' || vendor === 'XIONGMAI' ? 'POTENTIAL SPY CAMERA' : 
+                 ['HIKVISION', 'DAHUA', 'WYZE', 'ARLO', 'NEST', 'RING', 'FOSCAM'].includes(vendor) ? 'IP CAMERA' :
+                 vendor === 'ESPRESSIF' ? 'IOT MODULE' : 'SMART DEVICE';
+      return { vendor, type: type === 'SMART DEVICE' ? vendor : type };
     }
   }
   
-  return 'UNKNOWN';
+  return { vendor: 'UNKNOWN', type: 'UNKNOWN NODE' };
 }
 
 // Removed getBluetoothInfo as it's merged into Scanner
@@ -193,16 +202,17 @@ io.on('connection', (socket) => {
       // a. Start with WiFi APs
       scannerData.wifi.forEach(w => {
         const key = w.ssid || w.bssid;
+        const { vendor, type } = classifyDevice(w.bssid);
         emitterMap.set(key, {
           id: key,
           mac: w.bssid,
           ssid: w.ssid,
           rssi: w.rssi,
           source: 'WIFI',
-          type: 'WiFi Access Point',
+          type: type,
           lastSeen: now,
           name: (w.ssid === '<redacted>' || !w.ssid || w.ssid === '<hidden>') 
-                ? `${classifyDevice(w.bssid)} SOURCE` 
+                ? `${vendor} (Hidden Device)` 
                 : w.ssid
         });
       });
@@ -211,12 +221,13 @@ io.on('connection', (socket) => {
       network.forEach(d => {
         const key = d.mac.toLowerCase();
         if (!emitterMap.has(key)) {
+          const { type } = classifyDevice(d.mac);
           emitterMap.set(key, {
             ...d,
             id: key,
             source: 'NETWORK',
             lastSeen: now,
-            type: classifyDevice(d.mac) || 'CONNECTED NODE'
+            type: type || 'CONNECTED NODE'
           });
         } else {
           // If already exists, just update lastSeen
@@ -229,12 +240,13 @@ io.on('connection', (socket) => {
       scannerData.bluetooth.forEach(b => {
         const key = b.mac.toLowerCase();
         if (!emitterMap.has(key)) {
+          const { type } = classifyDevice(b.mac);
           emitterMap.set(key, {
             ...b,
             id: key,
             source: 'BLUETOOTH',
             lastSeen: now,
-            type: b.type || 'BLUETOOTH'
+            type: type || 'BLUETOOTH'
           });
         } else {
           const existing = emitterMap.get(key);
