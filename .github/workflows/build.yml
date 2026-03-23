@@ -54,7 +54,8 @@ jobs:
           git config --local user.name "GitHub Action"
           git add package.json frontend/package.json
           git commit -m "chore: bump version to ${{ steps.versioning.outputs.version }} [skip ci]" || echo "No changes to commit"
-          git push
+          git pull --rebase origin main
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
