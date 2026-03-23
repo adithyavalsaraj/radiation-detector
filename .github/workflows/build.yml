@@ -87,7 +87,7 @@ jobs:
       - name: Build and Package Desktop App
         run: |
           npm run build:frontend
-          npx electron-builder build --publish always
+          npx electron-builder build --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -146,19 +146,36 @@ jobs:
         with:
           name: Radiation-Tracker-Android
           path: frontend/android/app/build/outputs/apk/debug/RadiationTracker-android.apk
-      - name: Upload APK to Release
-        uses: softprops/action-gh-release@v1
+
+  publish-release:
+    needs: [prepare, build, build-android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v6
         with:
-          files: frontend/android/app/build/outputs/apk/debug/RadiationTracker-android.apk
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: "Radiation Tracker v${{ steps.get_version.outputs.version }}"
+          ref: main
+      - name: Download all artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: all-artifacts
+          pattern: Radiation-Tracker-*
+          merge-multiple: true
+      - name: Create Unified GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: all-artifacts/**/*
+          tag_name: v${{ needs.prepare.outputs.version }}
+          name: "Radiation Tracker v${{ needs.prepare.outputs.version }}"
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-vercel:
-    needs: [build, build-android]
+    needs: publish-release
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:

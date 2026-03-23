@@ -227,6 +227,19 @@ body {
   font-family: monospace;
 }
 
+.version-tag {
+  padding: 0.8rem 1rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+  letter-spacing: 1px;
+  font-weight: 700;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
 .main-content {
   flex: 1;
   background: var(--card-bg);
