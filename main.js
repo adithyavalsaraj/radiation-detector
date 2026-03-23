@@ -5,9 +5,7 @@ const { spawn } = require('child_process');
 let serverProcess;
 
 function startBackend() {
-  const serverPath = app.isPackaged 
-    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'backend', 'server.js')
-    : path.join(__dirname, 'backend', 'server.js');
+  const serverPath = path.join(__dirname, 'backend', 'server.js');
     
   console.log('Starting backend at:', serverPath);
 

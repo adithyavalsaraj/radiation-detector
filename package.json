@@ -29,7 +29,8 @@
       "output": "release"
     },
     "asarUnpack": [
-      "backend/**/*"
+      "backend/*.swift",
+      "backend/*.ps1"
     ],
     "files": [
       "main.js",
