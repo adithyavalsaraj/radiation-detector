@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import './Onboarding.css'; // Reusing some CSS classes for visual consistency
+import pkg from '../../package.json';
 
 export default function DownloadsModal({ onClose }) {
+  const version = pkg.version;
   const [os, setOs] = useState('unknown');
 
   useEffect(() => {
@@ -14,11 +15,13 @@ export default function DownloadsModal({ onClose }) {
     else if (/ipad|iphone|ipod/.test(platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) setOs('ios');
   }, []);
 
+  const getUrl = (file) => `https://github.com/adithyavalsaraj/radiation-detector/releases/download/v${version}/${file}`;
+
   return (
     <div className="onboarding-overlay" onClick={onClose}>
       <div className="glass-card onboarding-card" onClick={e => e.stopPropagation()}>
         <div className="tooltip-header" style={{ width: '100%', marginBottom: '1rem' }}>
-          <h2>Download Native Apps</h2>
+          <h2>Download Native Apps (v{version})</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         
@@ -27,24 +30,24 @@ export default function DownloadsModal({ onClose }) {
         </p>
 
         <div className="download-grid">
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-mac.dmg" target="_blank" rel="noopener noreferrer" className="download-btn mac">
+          <a href={getUrl('RadiationTracker-mac.dmg')} target="_blank" rel="noopener noreferrer" className="download-btn mac">
             🍏 Mac (DMG) {os === 'mac' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-win.exe" target="_blank" rel="noopener noreferrer" className="download-btn win">
+          <a href={getUrl('RadiationTracker-win.exe')} target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (Installer) {os === 'win' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-win.zip" target="_blank" rel="noopener noreferrer" className="download-btn win">
+          <a href={getUrl('RadiationTracker-win.zip')} target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (Portable ZIP)
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-linux.AppImage" target="_blank" rel="noopener noreferrer" className="download-btn lin">
+          <a href={getUrl('RadiationTracker-linux.AppImage')} target="_blank" rel="noopener noreferrer" className="download-btn lin">
             🐧 Linux (AppImage) {os === 'lin' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-android.apk" target="_blank" rel="noopener noreferrer" className="download-btn and">
+          <a href={getUrl('RadiationTracker-android.apk')} target="_blank" rel="noopener noreferrer" className="download-btn and">
             📱 Android (APK) {os === 'and' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases" target="_blank" rel="noopener noreferrer" className="download-btn ios">
-            🍎 iOS (Releases) {os === 'ios' && "★"}
-          </a>
+          <div className="download-btn ios disabled" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
+            🍎 iOS (Coming Soon) {os === 'ios' && "★"}
+          </div>
         </div>
       </div>
     </div>
