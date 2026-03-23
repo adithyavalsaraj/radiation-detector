@@ -9,9 +9,19 @@ function startBackend() {
     ? path.join(process.resourcesPath, 'app.asar.unpacked', 'backend', 'server.js')
     : path.join(__dirname, 'backend', 'server.js');
     
-  serverProcess = spawn('node', [serverPath], { 
+  console.log('Starting backend at:', serverPath);
+
+  serverProcess = spawn(process.execPath, [serverPath], { 
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'production' }
+    env: { 
+      ...process.env, 
+      NODE_ENV: 'production',
+      ELECTRON_RUN_AS_NODE: '1' 
+    }
+  });
+
+  serverProcess.on('error', (err) => {
+    console.error('Failed to start backend process:', err);
   });
 }
 

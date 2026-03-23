@@ -27,6 +27,9 @@
     "directories": {
       "output": "release"
     },
+    "asarUnpack": [
+      "backend/**/*"
+    ],
     "files": [
       "main.js",
       "backend/**/*",
