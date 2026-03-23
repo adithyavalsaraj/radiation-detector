@@ -30,16 +30,19 @@ export default function DownloadsModal({ onClose }) {
         </p>
 
         <div className="download-grid">
-          <a href={getUrl('RadiationTracker-mac.dmg')} target="_blank" rel="noopener noreferrer" className="download-btn mac">
+          <a href={getUrl('RadiationTracker-mac-dmg.dmg')} target="_blank" rel="noopener noreferrer" className="download-btn mac">
             🍏 Mac (DMG) {os === 'mac' && "★"}
           </a>
-          <a href={getUrl('RadiationTracker-win.exe')} target="_blank" rel="noopener noreferrer" className="download-btn win">
+          <a href={getUrl('RadiationTracker-win-nsis.exe')} target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (Installer) {os === 'win' && "★"}
           </a>
-          <a href={getUrl('RadiationTracker-win.zip')} target="_blank" rel="noopener noreferrer" className="download-btn win">
+          <a href={getUrl('RadiationTracker-win-portable.exe')} target="_blank" rel="noopener noreferrer" className="download-btn win">
+            🪟 Windows (Portable EXE)
+          </a>
+          <a href={getUrl('RadiationTracker-win-zip.zip')} target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (Portable ZIP)
           </a>
-          <a href={getUrl('RadiationTracker-linux.AppImage')} target="_blank" rel="noopener noreferrer" className="download-btn lin">
+          <a href={getUrl('RadiationTracker-linux-appimage.AppImage')} target="_blank" rel="noopener noreferrer" className="download-btn lin">
             🐧 Linux (AppImage) {os === 'lin' && "★"}
           </a>
           <a href={getUrl('RadiationTracker-android.apk')} target="_blank" rel="noopener noreferrer" className="download-btn and">
