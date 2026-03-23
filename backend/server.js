@@ -197,16 +197,13 @@ io.on('connection', (socket) => {
   const emitterMap = new Map();
   const AGING_TIMEOUT = 15000;
 
-  const interval = setInterval(async () => {
+  const updateLoop = async () => {
     try {
       const scannerData = await getScannerData();
       const network = await getConnectedDevices();
       const now = Date.now();
 
-      // 1. Unified Deduplication Logic with Aging
-      // Priority: WiFi (SSID match) > Network (MAC match) > BT (MAC match)
-
-      // a. Start with WiFi APs
+      // ... existing deduplication logic ...
       scannerData.wifi.forEach(w => {
         const key = w.ssid || w.bssid;
         const { vendor, type } = classifyDevice(w.bssid);
@@ -224,7 +221,6 @@ io.on('connection', (socket) => {
         });
       });
 
-      // b. Overlay Network Devices
       network.forEach(d => {
         const key = d.mac.toLowerCase();
         if (!emitterMap.has(key)) {
@@ -237,13 +233,11 @@ io.on('connection', (socket) => {
             type: type || 'CONNECTED NODE'
           });
         } else {
-          // If already exists, just update lastSeen
           const existing = emitterMap.get(key);
           emitterMap.set(key, { ...existing, lastSeen: now });
         }
       });
 
-      // c. Overlay Bluetooth
       scannerData.bluetooth.forEach(b => {
         const key = b.mac.toLowerCase();
         if (!emitterMap.has(key)) {
@@ -261,7 +255,6 @@ io.on('connection', (socket) => {
         }
       });
 
-      // 2. Prune invisible emitters
       for (const [key, emitter] of emitterMap.entries()) {
         if (now - emitter.lastSeen > AGING_TIMEOUT) {
           emitterMap.delete(key);
@@ -274,16 +267,20 @@ io.on('connection', (socket) => {
       if (currentWifi) socket.emit('wifi-signal', currentWifi);
       socket.emit('emitters', allEmitters);
 
-      console.log(`Tracking ${allEmitters.length} Unified Emitters (Aged Filter)`);
+      // Immediately schedule next scan with minimal delay
+      if (socket.connected) {
+        setTimeout(updateLoop, 500); 
+      }
     } catch (err) {
       console.error('Error in collection:', err);
+      setTimeout(updateLoop, 2000);
     }
-  }, 3000);
- // 3s for a clean loop with the 2s scan
+  };
+
+  updateLoop();
 
   socket.on('disconnect', () => {
     console.log('Client disconnected');
-    clearInterval(interval);
   });
 });
 
