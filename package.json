@@ -38,40 +38,36 @@
     ],
     "mac": {
       "category": "public.app-category.utilities",
+      "artifactName": "${productName}-${os}-zip.${ext}",
       "target": [
-        {
-          "target": "dmg",
-          "artifactName": "${productName}-${os}-dmg.${ext}"
-        },
-        {
-          "target": "zip",
-          "artifactName": "${productName}-${os}-zip.${ext}"
-        }
-      ]
+        "dmg",
+        "zip"
+      ],
+      "dmg": {
+        "artifactName": "${productName}-${os}-dmg.${ext}"
+      }
     },
     "win": {
+      "artifactName": "${productName}-${os}-zip.${ext}",
       "target": [
-        {
-          "target": "nsis",
-          "artifactName": "${productName}-${os}-nsis.${ext}"
-        },
-        {
-          "target": "portable",
-          "artifactName": "${productName}-${os}-portable.${ext}"
-        },
-        {
-          "target": "zip",
-          "artifactName": "${productName}-${os}-zip.${ext}"
-        }
-      ]
+        "nsis",
+        "portable",
+        "zip"
+      ],
+      "nsis": {
+        "artifactName": "${productName}-${os}-nsis.${ext}"
+      },
+      "portable": {
+        "artifactName": "${productName}-${os}-portable.${ext}"
+      }
     },
     "linux": {
       "target": [
-        {
-          "target": "AppImage",
-          "artifactName": "${productName}-${os}-appimage.${ext}"
-        }
-      ]
+        "AppImage"
+      ],
+      "appImage": {
+        "artifactName": "${productName}-${os}-appimage.${ext}"
+      }
     }
   },
   "devDependencies": {
