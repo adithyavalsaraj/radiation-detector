@@ -74,18 +74,20 @@ jobs:
       - name: Build Android APK
         run: chmod +x gradlew && ./gradlew assembleDebug
         working-directory: frontend/android
+      - name: Rename APK for Release
+        run: mv frontend/android/app/build/outputs/apk/debug/app-debug.apk frontend/android/app/build/outputs/apk/debug/RadiationTracker-android.apk
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Radiation-Tracker-Android
-          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          path: frontend/android/app/build/outputs/apk/debug/RadiationTracker-android.apk
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: frontend/android/app/build/outputs/apk/debug/app-debug.apk
-          tag_name: "v1.0.0-build-${{ github.run_number }}"
-          name: "Radiation Tracker Build ${{ github.run_number }}"
-          draft: false
+          files: frontend/android/app/build/outputs/apk/debug/RadiationTracker-android.apk
+          tag_name: v1.0.5
+          name: "Radiation Tracker v1.0.5"
+          draft: true
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

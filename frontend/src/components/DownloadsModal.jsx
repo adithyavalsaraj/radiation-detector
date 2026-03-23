@@ -30,17 +30,17 @@ export default function DownloadsModal({ onClose }) {
           <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-mac.dmg" target="_blank" rel="noopener noreferrer" className="download-btn mac">
             🍏 Mac (DMG) {os === 'mac' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-windows.exe" target="_blank" rel="noopener noreferrer" className="download-btn win">
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-win.exe" target="_blank" rel="noopener noreferrer" className="download-btn win">
             🪟 Windows (EXE) {os === 'win' && "★"}
           </a>
           <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-linux.AppImage" target="_blank" rel="noopener noreferrer" className="download-btn lin">
             🐧 Linux (AppImage) {os === 'lin' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector" target="_blank" rel="noopener noreferrer" className="download-btn and">
-            📱 Android (Source) {os === 'and' && "★"}
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-android.apk" target="_blank" rel="noopener noreferrer" className="download-btn and">
+            📱 Android (APK) {os === 'and' && "★"}
           </a>
-          <a href="https://github.com/adithyavalsaraj/radiation-detector" target="_blank" rel="noopener noreferrer" className="download-btn ios">
-            🍎 iOS (Source) {os === 'ios' && "★"}
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases" target="_blank" rel="noopener noreferrer" className="download-btn ios">
+            🍎 iOS (Releases) {os === 'ios' && "★"}
           </a>
         </div>
       </div>
