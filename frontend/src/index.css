@@ -6,11 +6,10 @@
   --text-main: #e0e6ed;
   --text-dim: #94a3b8;
   --color-core: #ff3e3e;
-  --color-mobile: #00f2ff;
-  --color-laptop: #bd00ff;
-  --color-iot: #ffea00;
   --color-router: #00ff88;
-  --color-bluetooth: #2d73ff;
+  --color-bluetooth: #bd00ff;
+  --color-node: #00f2ff;
+  --color-spy: #ff0000;
   --color-emitter: #ff9d00;
   --glass-border: rgba(255, 255, 255, 0.08);
 }
@@ -620,11 +619,11 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 8px currentColor;
 }
-.dot.wifi { color: var(--accent-color); }
-.dot.node { color: #00ff88; }
-.dot.bt { color: #bd00ff; }
-.dot.spy-cam { color: #ff0000; }
-.dot.unknown { color: #ff3e3e; }
+.dot.wifi { color: var(--color-router); }
+.dot.node { color: var(--color-node); }
+.dot.bt { color: var(--color-bluetooth); }
+.dot.spy-cam { color: var(--color-spy); }
+.dot.unknown { color: var(--color-core); }
 
 /* Menu Toggle & Mobile Header */
 .menu-toggle {
