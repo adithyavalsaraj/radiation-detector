@@ -465,18 +465,18 @@ function App() {
                   <div
                     className={`blip-dot ${dev.type === 'POTENTIAL SPY CAMERA' ? 'spy-pulse' : ''}`}
                     style={{
-                      background: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' :
-                                 dev.type === 'IP CAMERA' ? '#ff9d00' :
+                      background: dev.type === 'POTENTIAL SPY CAMERA' ? 'var(--color-spy)' :
+                                 dev.type === 'IP CAMERA' ? 'var(--color-emitter)' :
                                  dev.source === 'WIFI' ? 'var(--color-router)' : 
-                                 dev.source === 'BLUETOOTH' ? 'var(--color-bluetooth)' : 'var(--accent-color)',
+                                 dev.source === 'BLUETOOTH' ? 'var(--color-bluetooth)' : 'var(--color-node)',
                       width: dev.type === 'POTENTIAL SPY CAMERA' ? '12px' : (dev.source === 'WIFI' ? '6px' : '8px'),
                       height: dev.type === 'POTENTIAL SPY CAMERA' ? '12px' : (dev.source === 'WIFI' ? '6px' : '8px')
                     }}
                   >
                     <div className="blip-label" style={{ 
                       transform: `rotate(-${dev.angle}deg)`,
-                      color: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' : '#fff',
-                      borderColor: dev.type === 'POTENTIAL SPY CAMERA' ? '#ff0000' : 'rgba(255, 255, 255, 0.1)'
+                      color: dev.type === 'POTENTIAL SPY CAMERA' ? 'var(--color-spy)' : '#fff',
+                      borderColor: dev.type === 'POTENTIAL SPY CAMERA' ? 'var(--color-spy)' : 'rgba(255, 255, 255, 0.1)'
                     }}>
                       {dev.type === 'POTENTIAL SPY CAMERA' ? '⚠️ ' : ''}
                       {(dev.name || dev.ssid || 'UNKNOWN').toUpperCase()}
