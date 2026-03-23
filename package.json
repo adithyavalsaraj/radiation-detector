@@ -1,6 +1,6 @@
 {
   "name": "wifi-locator-monorepo",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "WiFi Radiation Detector and Radar Tracker",
   "author": "adithyavalsaraj",
   "private": true,
