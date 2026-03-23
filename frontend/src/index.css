@@ -310,6 +310,24 @@ body {
   100% { width: 400%; height: 400%; opacity: 0; }
 }
 
+.spy-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spy-pulse-anim 1.5s infinite;
+}
+
+@keyframes spy-pulse-anim {
+  0% { width: 100%; height: 100%; opacity: 1; border-width: 3px; }
+  100% { width: 500%; height: 500%; opacity: 0; border-width: 1px; }
+}
+
 .blip-label {
   position: absolute;
   top: 14px;
@@ -592,6 +610,7 @@ body {
 .dot.wifi { color: var(--accent-color); }
 .dot.node { color: #00ff88; }
 .dot.bt { color: #bd00ff; }
+.dot.spy-cam { color: #ff0000; }
 .dot.unknown { color: #ff3e3e; }
 
 /* Menu Toggle & Mobile Header */
