@@ -7,27 +7,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  prepare:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
+    outputs:
+      version: ${{ steps.versioning.outputs.version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm install
 
       - name: Calculate Next Version
         id: versioning
@@ -47,8 +42,6 @@ jobs:
           cd frontend && npm version $BUMP_TYPE --no-git-tag-version && cd ..
           NEW_VERSION=$(node -p "require('./package.json').version")
           
-          echo "NEW_TAG=v$NEW_VERSION" >> $GITHUB_ENV
-          echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit and Push Version Bump
@@ -56,10 +49,36 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add package.json frontend/package.json
-          git commit -m "chore: bump version to ${{ steps.versioning.outputs.version }} [skip ci]"
+          git commit -m "chore: bump version to ${{ steps.versioning.outputs.version }} [skip ci]" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          ref: main # Ensure we pick up the pushed version bump
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build and Package Desktop App
         run: |
@@ -82,13 +101,14 @@ jobs:
 
   build-android:
     runs-on: ubuntu-latest
-    needs: build # Ensure version bump happens first
+    needs: build # Ensure desktop build finishes first
     permissions:
       contents: write
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
         with:
+          ref: main # Ensure we pick up the pushed version bump
           fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v4
