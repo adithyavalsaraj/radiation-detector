@@ -1,6 +1,6 @@
 {
   "name": "wifi-locator-monorepo",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "private": true,
   "workspaces": [
     "frontend",
@@ -42,7 +42,11 @@
       ]
     },
     "win": {
-      "target": ["nsis", "portable", "zip"]
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ]
     },
     "linux": {
       "target": [
