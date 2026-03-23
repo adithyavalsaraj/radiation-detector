@@ -16,7 +16,7 @@
     "start": "concurrently \"npm run server\" \"npm run dev:web\"",
     "build:frontend": "npm run build --workspace=frontend",
     "build:app": "npm run build:frontend && electron-builder",
-    "build": "npm run build:frontend"
+    "build": "npm run build:frontend && cp -r frontend/dist ./dist"
   },
   "repository": "https://github.com/adithyavalsaraj/radiation-detector",
   "build": {
