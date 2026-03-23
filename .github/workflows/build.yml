@@ -52,7 +52,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add package.json frontend/package.json
+          git add .
           git commit -m "chore: bump version to ${{ steps.versioning.outputs.version }} [skip ci]" || echo "No changes to commit"
           git pull --rebase origin main
           git push origin main
