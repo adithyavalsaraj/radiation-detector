@@ -4,6 +4,7 @@ import "./index.css";
 import Onboarding from './components/Onboarding';
 import DownloadsModal from './components/DownloadsModal';
 import { NativeScanner } from './utils/NativeScanner';
+import pkg from '../../package.json';
 
 const getInitialSocketUrl = () => {
 
@@ -347,6 +348,9 @@ function App() {
             )}
           </>
         )}
+        <div className="version-tag">
+          V{pkg.version}
+        </div>
       </div>
 
       <div className="main-content" onClick={() => setSelectedDevice(null)}>
