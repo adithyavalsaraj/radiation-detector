@@ -58,24 +58,41 @@ function getScannerData() {
         try { resolve(JSON.parse(stdout)); } catch (e) { resolve({ wifi: [], bluetooth: [] }); }
       });
     } else if (isWin) {
-      exec('netsh wlan show networks mode=bssid', (error, stdout) => {
-        if (error) return resolve({ wifi: [], bluetooth: [] });
-        const wifi = [];
-        const lines = stdout.split('\n');
-        let currentSSID = '';
-        lines.forEach(line => {
-          const ssidMatch = line.match(/SSID \d+ : (.*)/);
-          if (ssidMatch) currentSSID = ssidMatch[1].trim();
-          const bssidMatch = line.match(/BSSID \d+ : (.*)/);
-          if (bssidMatch) {
-            const bssid = bssidMatch[1].trim();
-            const signalLine = lines[lines.indexOf(line) + 1] || '';
-            const signalMatch = signalLine.match(/Signal\s+:\s+(\d+)%/);
-            const rssi = signalMatch ? (parseInt(signalMatch[1]) / 2) - 100 : -95;
-            wifi.push({ ssid: currentSSID, bssid, rssi });
-          }
+      // Run both netsh for WiFi and powershell for BT
+      const wifiPromise = new Promise((res) => {
+        exec('netsh wlan show networks mode=bssid', (error, stdout) => {
+          if (error) return res([]);
+          const wifi = [];
+          const lines = stdout.split('\n');
+          let currentSSID = '';
+          lines.forEach(line => {
+            const ssidMatch = line.match(/SSID \d+ : (.*)/);
+            if (ssidMatch) currentSSID = ssidMatch[1].trim();
+            const bssidMatch = line.match(/BSSID \d+ : (.*)/);
+            if (bssidMatch) {
+              const bssid = bssidMatch[1].trim();
+              const signalLine = lines[lines.indexOf(line) + 1] || '';
+              const signalMatch = signalLine.match(/Signal\s+:\s+(\d+)%/);
+              const rssi = signalMatch ? (parseInt(signalMatch[1]) / 2) - 100 : -95;
+              wifi.push({ ssid: currentSSID, bssid, rssi });
+            }
+          });
+          res(wifi);
         });
-        resolve({ wifi, bluetooth: [] });
+      });
+
+      const btPromise = new Promise((res) => {
+        exec(`powershell -ExecutionPolicy Bypass -File scanner.ps1`, { cwd: __dirname }, (error, stdout) => {
+          if (error) return res([]);
+          try {
+            const data = JSON.parse(stdout);
+            res(data.bluetooth || []);
+          } catch (e) { res([]); }
+        });
+      });
+
+      Promise.all([wifiPromise, btPromise]).then(([wifi, bluetooth]) => {
+        resolve({ wifi, bluetooth });
       });
     } else if (isLinux) {
       exec('nmcli -t -f BSSID,SIGNAL,SSID dev wifi', (error, stdout) => {
@@ -217,7 +234,7 @@ io.on('connection', (socket) => {
             id: key,
             source: 'BLUETOOTH',
             lastSeen: now,
-            type: classifyDevice(b.mac) || 'BLUETOOTH'
+            type: b.type || 'BLUETOOTH'
           });
         } else {
           const existing = emitterMap.get(key);

@@ -70,26 +70,38 @@ export const NativeScanner = {
       }
       
       const bleDevices = [];
+      const seenDevices = new Set();
+
       await BleClient.requestLEScan(
         { services: [] },
         (result) => {
-          if (result.device) {
+          if (result.device && !seenDevices.has(result.device.deviceId)) {
+            const deviceId = result.device.deviceId;
+            const rawName = result.device.name || result.localName;
+            
+            // Format a better fallback name: Device Name OR "BT: [Last 4 chars of ID]"
+            const displayName = rawName && rawName !== 'Unknown' 
+              ? rawName 
+              : `BT:${deviceId.replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase()}`;
+
             bleDevices.push({
-              id: result.device.deviceId,
-              mac: result.device.deviceId,
-              ssid: result.device.name || 'Bluetooth LE Device',
+              id: deviceId,
+              mac: deviceId,
+              ssid: displayName,
               rssi: result.rssi || -95,
               source: 'BLUETOOTH',
               type: 'Bluetooth Device',
               lastSeen: Date.now(),
-              name: result.device.name || 'UNKNOWN BT'
+              name: displayName
             });
+            
+            seenDevices.add(deviceId);
           }
         }
       );
 
-      // Wait for results
-      await new Promise(r => setTimeout(r, 1500));
+      // Wait for results - Increased to 3s for better "Scan Response" packet capture
+      await new Promise(r => setTimeout(r, 3000));
       await BleClient.stopLEScan();
 
       results = [...results, ...bleDevices];
