@@ -31,7 +31,10 @@ export default function DownloadsModal({ onClose }) {
             🍏 Mac (DMG) {os === 'mac' && "★"}
           </a>
           <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-win.exe" target="_blank" rel="noopener noreferrer" className="download-btn win">
-            🪟 Windows (EXE) {os === 'win' && "★"}
+            🪟 Windows (Installer) {os === 'win' && "★"}
+          </a>
+          <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-win.zip" target="_blank" rel="noopener noreferrer" className="download-btn win">
+            🪟 Windows (Portable ZIP)
           </a>
           <a href="https://github.com/adithyavalsaraj/radiation-detector/releases/latest/download/RadiationTracker-linux.AppImage" target="_blank" rel="noopener noreferrer" className="download-btn lin">
             🐧 Linux (AppImage) {os === 'lin' && "★"}

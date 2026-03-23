@@ -39,7 +39,7 @@
       ]
     },
     "win": {
-      "target": "nsis"
+      "target": ["nsis", "portable", "zip"]
     },
     "linux": {
       "target": [
