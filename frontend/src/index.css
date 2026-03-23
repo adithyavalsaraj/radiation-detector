@@ -359,7 +359,8 @@ body {
 .status-banner {
   position: absolute;
   top: 1.5rem;
-  right: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 0.5rem 1rem;
   border-radius: 12px;
   font-size: 0.7rem;
@@ -368,6 +369,7 @@ body {
   color: #ff3e3e;
   border: 1px solid rgba(255, 62, 62, 0.2);
   letter-spacing: 1px;
+  z-index: 100;
 }
 
 .status-banner.native-status {
@@ -556,12 +558,13 @@ body {
 /* Radar Legend Overlay */
 .radar-legend {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
-  padding: 1rem;
+  top: 1.5rem;
+  left: 1.5rem;
+  padding: 0.8rem 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.2rem;
   z-index: 10;
   pointer-events: none;
   background: rgba(0,0,0,0.4);
@@ -670,8 +673,15 @@ body {
   }
 
   .radar-legend {
-    left: 1rem;
-    top: 6rem; /* Shift down to avoid menu toggle */
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    bottom: 8rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: auto;
+    max-width: 90%;
+    align-items: flex-start;
   }
 
   .signal-info {

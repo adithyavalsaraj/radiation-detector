@@ -34,11 +34,18 @@ class Scanner: NSObject, CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         let id = peripheral.identifier.uuidString
-        let name = peripheral.name ?? (advertisementData[CBAdvertisementDataLocalNameKey] as? String) ?? "Unknown BT"
+        let rawName = peripheral.name ?? (advertisementData[CBAdvertisementDataLocalNameKey] as? String)
+        
+        let name = (rawName != nil && rawName != "" && rawName != "Unknown") ? rawName! : "BT:\(id.suffix(4).uppercased())"
         
         let existingIndex = btResults.firstIndex { ($0["mac"] as? String) == id }
         if let index = existingIndex {
             btResults[index]["rssi"] = RSSI.intValue
+            if name.count > 0 && !(btResults[index]["name"] as? String ?? "").contains("BT:") {
+                 // Keep the existing proper name if it has one
+            } else {
+                 btResults[index]["name"] = name
+            }
         } else {
             btResults.append([
                 "name": name,
@@ -64,6 +71,6 @@ class Scanner: NSObject, CBCentralManagerDelegate {
 let scanner = Scanner()
 scanner.scanWifi()
 
-// Run for 2 seconds to gather BT signals
-RunLoop.main.run(until: Date(timeIntervalSinceNow: 2.0))
+// Run for 3 seconds to gather BT signals (increased from 2s)
+RunLoop.main.run(until: Date(timeIntervalSinceNow: 3.0))
 scanner.printResults()
