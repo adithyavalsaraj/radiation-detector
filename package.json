@@ -22,7 +22,6 @@
   "build": {
     "appId": "com.wifilocator.app",
     "productName": "RadiationTracker",
-    "artifactName": "${productName}-${os}-${target}.${ext}",
     "publish": [
       "github"
     ],
@@ -38,21 +37,40 @@
       "frontend/dist/**/*"
     ],
     "mac": {
+      "category": "public.app-category.utilities",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "artifactName": "${productName}-${os}-dmg.${ext}"
+        },
+        {
+          "target": "zip",
+          "artifactName": "${productName}-${os}-zip.${ext}"
+        }
       ]
     },
     "win": {
       "target": [
-        "nsis",
-        "portable",
-        "zip"
+        {
+          "target": "nsis",
+          "artifactName": "${productName}-${os}-nsis.${ext}"
+        },
+        {
+          "target": "portable",
+          "artifactName": "${productName}-${os}-portable.${ext}"
+        },
+        {
+          "target": "zip",
+          "artifactName": "${productName}-${os}-zip.${ext}"
+        }
       ]
     },
     "linux": {
       "target": [
-        "AppImage"
+        {
+          "target": "AppImage",
+          "artifactName": "${productName}-${os}-appimage.${ext}"
+        }
       ]
     }
   },
