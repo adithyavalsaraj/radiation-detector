@@ -70,6 +70,11 @@
       "artifactName": "${productName}-${os}-appimage.${ext}"
     }
   },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
