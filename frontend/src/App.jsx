@@ -102,6 +102,9 @@ function App() {
             anglesRef.current[id] = dev.source === 'WIFI' 
               ? (Math.random() * 360) 
               : (sweepAngleRef.current % 360);
+          } else {
+            // Subtle angle drift to keep it feeling alive (max 0.5 degrees per update)
+            anglesRef.current[id] = (anglesRef.current[id] + (Math.random() - 0.5) * 1) % 360;
           }
           const angle = anglesRef.current[id];
 
@@ -121,43 +124,57 @@ function App() {
   useEffect(() => {
     if (!NativeScanner.isSupported()) return;
 
-    const nativeInterval = setInterval(async () => {
-      if (isPausedRef.current) return;
+    let isScanning = false;
+    let stopNative = false;
+
+    const runNativeScan = async () => {
+      if (stopNative || isScanning || isPausedRef.current) return;
+      isScanning = true;
       
-      const nativeEmitters = await NativeScanner.scan();
-      if (nativeEmitters.length > 0) {
-        setIsNative(true);
-        nativeEmptyCountRef.current = 0;
-        setEmitters((prev) => {
-          const merged = [...prev];
-          nativeEmitters.forEach(ne => {
-            const id = ne.id;
-            const rssi = ne.rssi || -95;
-            const smoothedRssi = smooth(id, rssi);
-            const distance = getDistanceFactor(smoothedRssi);
+      try {
+        const nativeEmitters = await NativeScanner.scan();
+        if (nativeEmitters.length > 0) {
+          setIsNative(true);
+          nativeEmptyCountRef.current = 0;
+          setEmitters((prev) => {
+            const merged = [...prev];
+            nativeEmitters.forEach(ne => {
+              const id = ne.id;
+              const rssi = ne.rssi || -95;
+              const smoothedRssi = smooth(id, rssi);
+              const distance = getDistanceFactor(smoothedRssi);
 
-            if (!anglesRef.current[id]) {
-              anglesRef.current[id] = Math.random() * 360;
-            }
-            const angle = anglesRef.current[id];
-            
-            const processedEmitter = { ...ne, angle, distance, smoothedRssi };
+              if (!anglesRef.current[id]) {
+                anglesRef.current[id] = Math.random() * 360;
+              } else {
+                anglesRef.current[id] = (anglesRef.current[id] + (Math.random() - 0.5) * 1) % 360;
+              }
+              const angle = anglesRef.current[id];
+              
+              const processedEmitter = { ...ne, angle, distance, smoothedRssi };
 
-            const idx = merged.findIndex(e => e.id === id);
-            if (idx === -1) merged.push(processedEmitter);
-            else if (!connected) merged[idx] = { ...merged[idx], ...processedEmitter }; 
+              const idx = merged.findIndex(e => e.id === id);
+              if (idx === -1) merged.push(processedEmitter);
+              else if (!connected) merged[idx] = { ...merged[idx], ...processedEmitter }; 
+            });
+            return merged;
           });
-          return merged;
-        });
-      } else {
-        nativeEmptyCountRef.current++;
-        if (nativeEmptyCountRef.current >= 3) {
-          setIsNative(false);
+        } else {
+          nativeEmptyCountRef.current++;
+          if (nativeEmptyCountRef.current >= 3) {
+            setIsNative(false);
+          }
         }
+      } catch (e) {
+        console.error("Native scan loop error:", e);
+      } finally {
+        isScanning = false;
+        if (!stopNative) setTimeout(runNativeScan, 500);
       }
-    }, 2000);
+    };
 
-    return () => clearInterval(nativeInterval);
+    runNativeScan();
+    return () => { stopNative = true; };
   }, [connected]);
 
   useEffect(() => {
