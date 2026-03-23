@@ -166,6 +166,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
+      - name: Verify Secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then echo "❌ VERCEL_TOKEN is MISSING"; exit 1; fi
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then echo "❌ VERCEL_ORG_ID is MISSING"; exit 1; fi
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then echo "❌ VERCEL_PROJECT_ID is MISSING"; exit 1; fi
+          echo "✅ All Vercel secrets are present."
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -174,3 +180,4 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./
+
